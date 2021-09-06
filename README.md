@@ -13,11 +13,11 @@ More precisely, the SLOPE problem is defined as
 \lambda\sum_{k=1}^n \gamma_k\vert\mathbf{x}\vert_{[k]}
 ```
 where
- - $\mathbf{x}\in\mathbb{R}^m$ is the observation vector
- - $\mathbf{A}\in\mathbb{R}^{m\times n}$ is the so-called dictionary
- - $\lambda>0$ a (positive) scalar
- - $\{\gamma_k\}_{k=1}^n$ a sequence of non-increasing nonnegative scalars such that $\gamma_1=1$,
- - $\vert\mathbf{x}\vert_{[k]}$ denotes the $k$th largest entry of $\mathbf{x}$ in absolute value
+ - $`\mathbf{x}\in\mathbb{R}^m`$ is the observation vector
+ - $`\mathbf{A}\in\mathbb{R}^{m\times n}`$ is the so-called dictionary
+ - $`\lambda>0`$ a (positive) scalar
+ - $`\{\gamma_k\}_{k=1}^n`$ a sequence of non-increasing nonnegative scalars such that $`\gamma_1=1`$,
+ - $`\vert\mathbf{x}\vert_{[k]}`$ denotes the $`k`$th largest entry of $`\mathbf{x}`$ in absolute value
 
 > [1] Clément Elvira, Cédric Herzet: “Safe rules for the identification of zeros in the solution of the Slope problem”, arXiv, septembre 2021; [arXiv:1911.07508](http://arxiv.org/abs/0000.00000)
 
