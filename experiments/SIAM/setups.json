@@ -1,0 +1,57 @@
+{
+	"setup1a": {
+		"remark": "OSCAR 1, 2, 3",
+
+		"m": 10,
+		"n": 30,
+
+		"dictionaries": [
+			"gaussian 0.",
+			"uniform",
+			"toeplitz"
+		],
+		"normalize": true,
+
+		"n_rep": 50,
+
+		"sequences": [
+			["oscar-lim", 1, 0.9],
+			["oscar-lim", 1.0, 0.1],
+			["oscar-lim", 1, 1e-3]
+		],
+
+		"list_ratio_lbd": [
+			0.3, 
+			0.5, 
+			0.8
+		]
+	},
+
+	"setup1b": {
+		"remark": "EXP 1, 2, 3",
+
+		"m": 100,
+		"n": 300,
+
+		"dictionaries": [
+			"gaussian 0.",
+			"uniform",
+			"toeplitz"
+		],
+		"normalize": true,
+
+		"n_rep": 50,
+
+		"sequences": [
+   			["exp-lim", 0.99999, 0.9],
+   			["exp-lim", 0.99999, 0.5],
+   			["exp-lim", 0.99999, 1e-2]
+		],
+
+		"list_ratio_lbd": [
+			0.3, 
+			0.5, 
+			0.8
+		]
+	}
+}
