@@ -1,1 +1,0 @@
-python viz_final.py --noshow --save
