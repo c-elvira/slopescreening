@@ -3,8 +3,8 @@ import time
 
 import numpy as np
 
-from src.solver.parameters import SlopeParameters, EnumLipchitzOptions
-from src.solver.prox import prox_owl
+from src.parameters import SlopeParameters, EnumLipchitzOptions, DualScalingOptions
+from src.prox import prox_owl
 
 
 def primal_func(vecy, Ax, x, lbd, vec_gammas) -> float:
@@ -85,6 +85,7 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
       # Precomputed quantities
    Aty = matA.T @ vecy
    normy2 = np.linalg.norm(vecy)**2
+   gamma_returned = vecgamma[::-1]
 
       # Coherence
    mu = algParameters.coherence
@@ -124,6 +125,8 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
    screening_test_1 = algParameters.screening1
    screening_test_2 = algParameters.screening2
 
+   vec_cumsum_gammas = np.cumsum(vecgamma)
+
    is_test_1 = False if screening_test_1 is None else True
    is_test_2 = False if screening_test_2 is None else True
 
@@ -145,10 +148,13 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
 
    best_costfunc = .5 * normy2
    best_vecx     = np.copy(vecx_hat)
-   best_vecu     = np.zeros(m)
    best_dualfunc = 0
 
    it = 0
+
+   # Security to prevent error with negative gap
+   gap_stop = max(algParameters.gap_stopping, 5e-16)
+
    time_starting = time.time()
    ellapsed_time = lambda: time.time() - time_starting
    while True:
@@ -160,34 +166,55 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
       vec_res = vecy - Ax
       neg_grad = matA[:, ind_active].T @ vec_res
 
-         # Dual scaling
-      index_sort_neg_grad = np.argsort(np.abs(neg_grad))[::-1]
-      beta_dual = np.abs(neg_grad[index_sort_neg_grad])
-      beta_dual = np.cumsum(beta_dual) / np.cumsum(vecgamma[:n_active])
-      max_beta_dual = max(np.max(beta_dual) / lbd, 1.)
-      vecu_hat = vec_res / max_beta_dual
+      # -- Evaluating primal function
+      # I drop the idea below. it is the "best strategy" only when evaluating the dual function
+      # ytAx = vecy.dot(Ax)
+      # normAx2 = np.linalg.norm(Ax, 2)**2
+      half_norm_res_2 = .5 * np.linalg.norm(vec_res, 2)**2
+      lbd_slope_norm = lbd * gamma_returned.dot(np.sort(np.abs(vecx_hat[ind_active])))
 
-      vec_cost_func.append(primal_func(vecy, Ax, vecx_hat[ind_active], lbd, vecgamma[:n_active]))
-      vec_dual_func.append(dual_func(vecy, normy2, vecu_hat))
+      vec_cost_func.append(half_norm_res_2 + lbd_slope_norm)
 
       if vec_cost_func[-1] < best_costfunc:
          best_costfunc = vec_cost_func[-1]
          best_vecx = np.copy(vecx_hat)
 
-      if vec_dual_func[-1] > best_dualfunc:
-         best_dualfunc = vec_dual_func[-1]
-         best_vecu = np.copy(vecu_hat)
+      gap = best_costfunc
 
 
-      gap = np.abs(best_costfunc - best_dualfunc)
-      # print(f"it {it} gap {gap}")
+      if (it % 20 == 0) or algParameters.eval_gap:
+         # -- Evaluating dual function (if needed)
+         # if algParameters.eval_gap:
+         index_sort_neg_grad = np.argsort(np.abs(neg_grad))[::-1]
+         # print(index_sort_neg_grad)
+
+         # Dual scaling
+         if algParameters.dual_scaling == DualScalingOptions.EXACT:
+            beta_dual = np.cumsum(np.abs(neg_grad[index_sort_neg_grad])) \
+               / vec_cumsum_gammas[:n_active]
+            coeff_dual_scaling = max(np.max(beta_dual) / lbd, 1.)
+
+         elif algParameters.dual_scaling == DualScalingOptions.BAO_ET_AL:
+            beta_dual = np.abs(neg_grad[index_sort_neg_grad]) / vecgamma[:n_active]
+            coeff_dual_scaling = max(np.max(beta_dual) / lbd, 1.)
+
+         else:
+            raise NotImplemented
+
+         yT_res = vecy.dot(vec_res)
+         d_func_val = (yT_res - half_norm_res_2 / coeff_dual_scaling) / coeff_dual_scaling
+
+         if algParameters.save_dfunc:
+         	vec_dual_func.append(d_func_val)
+         
+         gap = np.abs(best_costfunc - d_func_val)
 
 
       # ------------------
       #   Stopping rules
       # ------------------
 
-      if (it >= algParameters.max_it) or (gap <= algParameters.gap_stopping) or (ellapsed_time() > algParameters.time_stopping):
+      if (it >= algParameters.max_it) or (gap <= gap_stop) or (ellapsed_time() > algParameters.time_stopping):
          break
 
 
@@ -195,16 +222,45 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
       #      Screening
       # ------------------
 
-      if is_test_1 or is_test_2:
+      if (it % 20 == 0) and (is_test_1 or is_test_2):
+         # -- Evaluating dual function (if needed)
+         # if algParameters.eval_gap:
+         index_sort_neg_grad = np.argsort(np.abs(neg_grad))[::-1]
+         # print(index_sort_neg_grad)
 
-         Atu = neg_grad / max_beta_dual
-         gap_test = np.abs(vec_cost_func[-1] - vec_dual_func[-1])
+         # Dual scaling
+         if algParameters.dual_scaling == DualScalingOptions.EXACT:
+            beta_dual = np.cumsum(np.abs(neg_grad[index_sort_neg_grad])) \
+               / vec_cumsum_gammas[:n_active]
+            coeff_dual_scaling = max(np.max(beta_dual) / lbd, 1.)
 
-         # print(np.max(np.abs(Atu)), np.max(np.abs(matA.T @ vecu_hat)), lbd * vecgamma[:n_active])
+         elif algParameters.dual_scaling == DualScalingOptions.BAO_ET_AL:
+            beta_dual = np.abs(neg_grad[index_sort_neg_grad]) / vecgamma[:n_active]
+            coeff_dual_scaling = max(np.max(beta_dual) / lbd, 1.)
+
+         else:
+            raise NotImplemented
+
+         yT_res = vecy.dot(vec_res)
+         d_func_val = (yT_res - half_norm_res_2 / coeff_dual_scaling) / coeff_dual_scaling
+
+         # vec_dual_func.append(dualfunc)
+         
+         # we take vec_dual_func[-1] because the corresponding u is used for 
+         # the GAP ball
+         # gap = np.abs(best_costfunc - vec_dual_func[-1])
+         gap = np.abs(best_costfunc - d_func_val)
+
+         # Potential improvements
+         # - l218: Atu coulb commented 
+         # - l225: Atu coulb replaced by neg_grad and lbd by "coeff_dual_scaling * lbd" (+ radius)
+         # - l242: idem
+         # Atu = neg_grad / coeff_dual_scaling
+         # gap = np.abs(best_costfunc - vec_dual_func[-1])
 
          # 1. Apply test
-         if is_test_2 and do_test2(gap, gap_last_test):
-            out_test2 = screening_test_2.apply_test(np.abs(Atu), gap_test, lbd, vecgamma[:n_active], index=index_sort_neg_grad)
+         if is_test_2: # and do_test2(gap, gap_last_test):
+            out_test2 = screening_test_2.apply_test(np.abs(neg_grad), gap, lbd, vecgamma[:n_active], coeff_dual_scaling=coeff_dual_scaling, index=index_sort_neg_grad)
 
             if np.any(out_test2):
                # 2a. Set entry to 0
@@ -213,15 +269,17 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
                # 2b. Reduce set of active indices
                neg_grad   = neg_grad[np.bitwise_not(out_test2)]
                ind_active = ind_active[np.bitwise_not(out_test2)]
-               n_active  -= np.sum(out_test2)
+               nb_screen  = np.sum(out_test2)
+               n_active  -= nb_screen
+
+               gamma_returned = gamma_returned[nb_screen:]
 
                # schedule next test
-               gap_last_test = float(gap_test)
-               # print("all", n_active)
+               gap_last_test = float(gap)
                lip = update_Lip()
 
          elif is_test_1:
-            out_test1 = screening_test_1.apply_test(np.abs(Atu), gap_test, lbd, vecgamma[:n_active], index=index_sort_neg_grad)
+            out_test1 = screening_test_1.apply_test(np.abs(neg_grad), gap, lbd, vecgamma[:n_active], coeff_dual_scaling=coeff_dual_scaling, index=index_sort_neg_grad)
             
             if np.any(out_test1):
                # 2a. Set entry to 0
@@ -230,9 +288,10 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
                # 2b. Reduce set of active indices
                neg_grad       = neg_grad[np.bitwise_not(out_test1)]
                ind_active     = ind_active[np.bitwise_not(out_test1)]
-               n_active       -= np.sum(out_test1)
-               # print("single", n_active)
+               nb_screen      = np.sum(out_test1)
+               n_active      -= nb_screen 
 
+               gamma_returned = gamma_returned[nb_screen:]
                lip = update_Lip()
 
 
@@ -270,12 +329,12 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
 
    time_run = ellapsed_time()
 
+
    return {
       "sol": best_vecx,
-      "dualsol": best_vecu,
       "cost_function": np.array(vec_cost_func),
       "dual_function": np.array(vec_dual_func),
-      "gap": gap, #Best gap
+      "gap": gap,
       "time_run": time_run,
       "nb_it": it,
       "vec_n_active": np.array(vec_n_active),

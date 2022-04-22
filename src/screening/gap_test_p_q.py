@@ -4,15 +4,15 @@ import numpy as np
 from src.screening.ascreening import AbstractGapScreening
 
 
-class GapSphereSingleTest(AbstractGapScreening):
+class GapTestPequalQ(AbstractGapScreening):
    """ Single test safe sphere screening test for Slope
    """
    def __init__(self):
-      super(GapSphereSingleTest, self).__init__()
+      super(GapTestPequalQ, self).__init__()
 
-      self.name = "single test"
+      self.name = "Gap test p=q"
 
-   def apply_test(self, Atu_abs, gap, lbd, vec_gammas, offset_radius=0, index=None) -> np.ndarray:
+   def apply_test(self, Atu_abs, gap, lbd, vec_gammas, coeff_dual_scaling=1., offset_radius=0, index=None) -> np.ndarray:
       """ GAP Sphere screening test detailed in Cédric's node
       
       Parameters
@@ -27,6 +27,11 @@ class GapSphereSingleTest(AbstractGapScreening):
       vec_gammas : np.ndarray
          slope parameters
          size [n,]
+      coeff_dual_scaling : positif float
+         If coeff_dual_scaling is not feasible, dual scaling factor
+         such taht vecu / coeff_dual_scaling os dual feasible
+         Here for code optimization purposes
+         Default value is 1. (vecu is feasible)
       offset_radius : float
          additive term added to the redius
       index : np.ndarray
@@ -43,4 +48,4 @@ class GapSphereSingleTest(AbstractGapScreening):
       """
 
       radius = np.sqrt(2 * gap)
-      return Atu_abs < lbd * vec_gammas[-1] - radius - offset_radius
+      return Atu_abs < coeff_dual_scaling * (lbd * vec_gammas[-1] - radius) - offset_radius

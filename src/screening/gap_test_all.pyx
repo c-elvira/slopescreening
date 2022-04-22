@@ -18,9 +18,7 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 ctypedef np.npy_bool bool_t
 
 
-#(AbstractGapScreening)
-
-cdef class GAP_Ptest:
+cdef class GapTestAll:
    """ Generalized test
    """
 
@@ -47,13 +45,11 @@ cdef class GAP_Ptest:
 
       # self.vec_cumsum_gammas = &buf[0]
 
+      self.name = "GAP test-all (cython)"
+
 
    def __dealloc__(self):
       PyMem_Free(self.vec_cumsum_gammas)  # no-op if self.data is NULL
-
-
-   def get_name(self):
-      return "p-test cython"
 
 
    @cython.boundscheck(False) # turn off bounds-checking for entire function
@@ -62,7 +58,8 @@ cdef class GAP_Ptest:
       np.ndarray[np.npy_double, ndim=1] Atcabs, 
       double gap, 
       double lbd, 
-      np.ndarray[np.npy_double, ndim=1] vec_gammas, 
+      np.ndarray[np.npy_double, ndim=1] vec_gammas,
+      double coeff_dual_scaling =1.,
       double offset_radius=0., 
       np.ndarray[long, ndim=1] index=None
    ):
@@ -82,6 +79,11 @@ cdef class GAP_Ptest:
       vec_gammas : np.ndarray
          slope parameters
          size [n,]
+      coeff_dual_scaling : positif float
+         If coeff_dual_scaling is not feasible, dual scaling factor
+         such taht vecu / coeff_dual_scaling os dual feasible
+         Here for code optimization purposes
+         Default value is 1. (vecu is feasible)
       offset_radius : float
          additive term added to the redius
          default is 0
@@ -101,7 +103,9 @@ cdef class GAP_Ptest:
       # all indexes below range from 1 to n (instead of 0 to n-1)
       # in order to match the paper indexation rules
 
-      cdef double radius = np.sqrt(2 * gap) + offset_radius
+      cdef double radius  = coeff_dual_scaling * np.sqrt(2 * gap) + offset_radius
+      # cdef double lbd_aug = coeff_dual_scaling * lbd
+      cdef np.ndarray[np.npy_double, ndim=1] coeff_lbd_gamma = coeff_dual_scaling * lbd * vec_gammas
 
       cdef int n = Atcabs.shape[0]
       cdef int k, q, r
@@ -121,10 +125,10 @@ cdef class GAP_Ptest:
 
       # 2. Precomputing quantities
       cdef np.ndarray[np.npy_double, ndim=1] vec_f = np.cumsum(
-         lbd * vec_gammas[::-1] - Atcabs[index[::-1]] - radius
+         coeff_lbd_gamma[::-1] - Atcabs[index[::-1]] - radius
       )[::-1]
 
-      cdef double best_bound_q = vec_f[0] - lbd * vec_gammas[0]
+      cdef double best_bound_q = vec_f[0] - coeff_lbd_gamma[0]
       cdef double curr_bound_q = 0.
       cdef double best_bound_p = vec_f[0]
       cdef double curr_bound_p = 0.
@@ -140,7 +144,7 @@ cdef class GAP_Ptest:
             vec_p_star[k] = vec_p_star[k-1]
 
          # 1. Evaluate q*
-         curr_bound_q = vec_f[k-1] - lbd * vec_gammas[k-1]
+         curr_bound_q = vec_f[k-1] - coeff_lbd_gamma[k-1]
          if curr_bound_q > best_bound_q:
             best_bound_q = curr_bound_q
             vec_q_star[k] = k
@@ -155,7 +159,7 @@ cdef class GAP_Ptest:
             p = vec_p_star[q]
 
             # Evaluation of the threshold
-            tau = vec_f[p-1] - vec_f[q-1] + (lbd * vec_gammas[q-1] - radius)
+            tau = vec_f[p-1] - vec_f[q-1] + (coeff_lbd_gamma[q-1] - radius)
 
             # Test
             if Atcabs[index[l-1]] >= tau:

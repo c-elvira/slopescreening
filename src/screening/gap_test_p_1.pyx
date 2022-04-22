@@ -20,7 +20,7 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 #(AbstractGapScreening)
 
-cdef class Kappa_test:
+cdef class GapTestPequalOne:
    """ Generalized test
    """
 
@@ -72,13 +72,12 @@ cdef class Kappa_test:
       #    (1. + vec_coherence_function) * np.arange(1, n+1, dtype=np.double)
       # ).copy()
 
+      self.name = "Gap test p=1 (cython)"
+
 
    def __dealloc__(self):
       PyMem_Free(self.vec_cumsum_gammas)  # no-op if self.data is NULL
       PyMem_Free(self.vec_kappa_q)  # no-op if self.data is NULL
-
-   def get_name(self):
-      return "kappa-test cython"
 
 
    @cython.boundscheck(False) # turn off bounds-checking for entire function
@@ -87,7 +86,8 @@ cdef class Kappa_test:
       np.ndarray[np.npy_double, ndim=1] Atcabs, 
       double gap, 
       double lbd, 
-      np.ndarray[np.npy_double, ndim=1] vec_gammas, 
+      np.ndarray[np.npy_double, ndim=1] vec_gammas,
+      double coeff_dual_scaling = 1., 
       double offset_radius=0., 
       np.ndarray[long, ndim=1] index=None
       ):
@@ -107,6 +107,14 @@ cdef class Kappa_test:
       vec_gammas : np.ndarray
          slope parameters
          size [n,]
+      vec_gammas : np.ndarray
+         slope parameters
+         size [n,]
+      coeff_dual_scaling : positif float
+         If coeff_dual_scaling is not feasible, dual scaling factor
+         such taht vecu / coeff_dual_scaling os dual feasible
+         Here for code optimization purposes
+         Default value is 1. (vecu is feasible)
       offset_radius : float
          additive term added to the redius
          default is 0
@@ -127,7 +135,8 @@ cdef class Kappa_test:
       cdef int l_min = 0
 
       cdef double bound
-      cdef double radius = np.sqrt(2 * gap) + offset_radius
+      cdef double radius = coeff_dual_scaling * np.sqrt(2 * gap) + offset_radius
+      cdef double coeff_lbd = coeff_dual_scaling * lbd
 
       cdef np.ndarray[np.npy_double, ndim=1] sigmas = np.zeros(n+1)
 
@@ -142,7 +151,7 @@ cdef class Kappa_test:
       sigmas[1:] = np.cumsum(Atcabs[index])
 
       for q in range(n-1, -1, -1):
-         bound = lbd * self.vec_cumsum_gammas[q] - self.vec_kappa_q[q] * radius - sigmas[q]
+         bound = coeff_lbd * self.vec_cumsum_gammas[q] - self.vec_kappa_q[q] * radius - sigmas[q]
 
          if Atcabs[index[q]] < bound:
             l_q = 0

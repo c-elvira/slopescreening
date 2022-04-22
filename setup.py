@@ -23,9 +23,8 @@ setup(
     packages=find_packages(exclude=('tests', 'docs')),
     ext_modules=cythonize([
         "src/screening/utils.pyx", 
-        "src/screening/gap_ptest.pyx",
-        "src/screening/gap_rqtest.pyx",
-        "src/screening/kappa_test.pyx",
+        "src/screening/gap_test_all.pyx",
+        "src/screening/gap_test_p_1.pyx",
     ]),
 )
 

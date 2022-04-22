@@ -12,18 +12,16 @@ class AbstractGapScreening(ABC):
       self.name = "NONAME"
    
 
-   def get_name(self):
-      return self.name
-
-
    @abstractmethod
-   def apply_test(self, Atu_abs, gap, lbd, vec_gammas, offset_radius=0, index=None) -> np.ndarray:
+   def apply_test(self, Atu_abs, gap, lbd, vec_gammas, coeff_dual_scaling=1., offset_radius=0, index=None) -> np.ndarray:
       """ GAP Sphere screening test detailed in Cédric's node
       
       Parameters
       ----------
       Atu_abs : np.ndarray
-         vector |matA.T @ vecu| where vecu is dual admissible
+         vector |matA.T @ vecu|
+         vecu is not necessarily dual admissible
+         In that case, the dual scaling factor must be provided
          size [n]
       gap : positive float
          duality gap
@@ -32,6 +30,11 @@ class AbstractGapScreening(ABC):
       vec_gammas : np.ndarray
          slope parameters
          size [n,]
+      coeff_dual_scaling : positif float
+         If coeff_dual_scaling is not feasible, dual scaling factor
+         such taht vecu / coeff_dual_scaling os dual feasible
+         Here for code optimization purposes
+         Default value is 1. (vecu is feasible)
       offset_radius : float
          additive term added to the redius
       index : np.ndarray
