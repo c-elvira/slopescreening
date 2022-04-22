@@ -3,8 +3,8 @@ import time
 
 import numpy as np
 
-from src.parameters import SlopeParameters, EnumLipchitzOptions, DualScalingOptions
-from src.prox import prox_owl
+from src.solver.parameters import SlopeParameters, EnumLipchitzOptions, DualScalingOptions
+from src.solver.prox import prox_owl
 
 
 def primal_func(vecy, Ax, x, lbd, vec_gammas) -> float:
@@ -182,7 +182,7 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
       gap = best_costfunc
 
 
-      if (it % 20 == 0) or algParameters.eval_gap:
+      if algParameters.eval_gap and (it % algParameters.eval_gap_it == 0):
          # -- Evaluating dual function (if needed)
          # if algParameters.eval_gap:
          index_sort_neg_grad = np.argsort(np.abs(neg_grad))[::-1]

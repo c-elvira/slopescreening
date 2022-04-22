@@ -34,7 +34,8 @@ class SlopeParameters(object):
 
    dual_scaling: DualScalingOptions = DualScalingOptions.EXACT
 
-   eval_gap: bool = True
+   eval_gap: bool   = True
+   eval_gap_it: int = 1
 
    lipchitz_constant: float = None
    lipchitz_update: EnumLipchitzOptions = EnumLipchitzOptions.EXACT

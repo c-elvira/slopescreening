@@ -38,5 +38,53 @@ class TestSolver(unittest.TestCase):
          # 1e-15 due to machine precision error
       self.assertTrue( (vec_diff <= 1e-14).all() )
 
+
+   def test_no_gap_evluation(self):
+      # 1. Create problem
+      m = 20
+      n = 50
+      matA = generate_dic("gaussian", m, n, True)
+      vecy = np.random.randn(m)
+      vec_gammas = np.linspace(0, 1, n)[::-1]
+
+      # 2. Compute lambda_max
+      lbd_max = utils.get_lambda_max(vecy, matA, vec_gammas)
+
+      # 3. Eval solution of slope problem
+      algParameters = SlopeParameters()
+      algParameters.max_it = 1000
+      algParameters.accelerated = False
+      algParameters.eval_gap    = False
+      out = slope_gp(vecy, matA, .5 * lbd_max, vec_gammas, algParameters)
+
+      best_cost = np.min(out["cost_function"])
+      gap       = out["gap"]
+      self.assertTrue(np.abs(best_cost - gap) <= 1e-10) 
+
+
+   def test_gap_tend_to_zero(self):
+      # 1. Create problem
+      m = 20
+      n = 50
+      matA = generate_dic("gaussian", m, n, True)
+      vecy = np.random.randn(m)
+      vec_gammas = np.linspace(0, 1, n)[::-1]
+
+      # 2. Compute lambda_max
+      lbd_max = utils.get_lambda_max(vecy, matA, vec_gammas)
+
+      # 3. Eval solution of slope problem
+      algParameters = SlopeParameters()
+      algParameters.max_it = 1e6
+      algParameters.accelerated  = False
+      algParameters.eval_gap     = True
+      algParameters.gap_stopping = 1e-8
+      out = slope_gp(vecy, matA, .5 * lbd_max, vec_gammas, algParameters)
+
+      gap       = out["gap"]
+
+      self.assertTrue(gap <= 1e-8)
+
+
 if __name__ == '__main__':
    unittest.main()
