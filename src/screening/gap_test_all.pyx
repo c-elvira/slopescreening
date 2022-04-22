@@ -23,6 +23,7 @@ cdef class GapTestAll:
    """
 
    cdef double *vec_cumsum_gammas
+   cdef char* name
 
    @cython.boundscheck(False) # turn off bounds-checking for entire function
    @cython.wraparound(False)  # turn off negative index wrapping for entire function

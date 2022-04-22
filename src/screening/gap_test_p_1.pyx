@@ -29,6 +29,7 @@ cdef class GapTestPequalOne:
 
    cdef double* vec_cumsum_gammas
    cdef double* vec_kappa_q
+   cdef char* name
 
    # cdef np.ndarray vec_cumsum_gammas
    # cdef np.ndarray vec_kappa_q

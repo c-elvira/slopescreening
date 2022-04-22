@@ -21,6 +21,15 @@ class SlopePb(object):
       self.lbd = ratio_lbd * self.lbdmax
 
 
+   def get_dual_scaling_coeff(self, vecr):
+
+      beta_dual = np.sort(np.abs(self.matA.T @ vecr))[::-1]
+      beta_dual = np.cumsum(beta_dual) / \
+         np.cumsum(self.lbd * self.vec_gammas)
+
+      return 1. / max(np.max(beta_dual), 1.)
+
+
    def make_dual_scaling(self, vecr):
 
       beta_dual = np.sort(np.abs(self.matA.T @ vecr))[::-1]

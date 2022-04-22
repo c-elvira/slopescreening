@@ -1,9 +1,9 @@
 {
-	"setup1a": {
+	"setupSIAM": {
 		"remark": "OSCAR 1, 2, 3",
 
-		"m": 10,
-		"n": 30,
+		"m": 100,
+		"n": 300,
 
 		"dictionaries": [
 			"gaussian 0.",
@@ -13,6 +13,8 @@
 		"normalize": true,
 
 		"n_rep": 50,
+
+		"eval_gap_it": 20,
 
 		"sequences": [
 			["oscar-lim", 1, 0.9],
@@ -41,6 +43,8 @@
 		"normalize": true,
 
 		"n_rep": 50,
+
+		"eval_gap_it": 20,
 
 		"sequences": [
    			["exp-lim", 0.99999, 0.9],

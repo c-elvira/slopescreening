@@ -23,6 +23,8 @@ class Setup(object):
 
       self.n_rep = data["n_rep"]
 
+      self.eval_gap_it = data["eval_gap_it"]
+
       self.list_sequence = data["sequences"]
       self.list_ratio_lbd = data["list_ratio_lbd"]
 
