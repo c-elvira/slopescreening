@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 import argparse, sys
-from pathlib import Path
 
 import numpy as np
 
 from src import __version__
 from src.solver.slope import slope_gp
-from src.solver.parameters import SlopeParameters, EnumLipchitzOptions
 from src.utils import get_lambda_max, gamma_sequence_generator
 from src.dictionaries import generate_dic
-from src.screening.gap_ptest import GAP_Ptest
+
+from src.solver.parameters import SlopeParameters, EnumLipchitzOptions
+from src.screening.gap_test_all import GapTestAll
 
 from experiments.SIAM.setup import Setup
 
 
 parser=argparse.ArgumentParser()
-parser.add_argument('--id', help='setup id', type=str, default=1)
+parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 parser.add_argument('--erase', help='restart xp', action="store_true")
-parser.add_argument('--precision', help='stop when gap reaches 1e-precision')
+parser.add_argument('--precision', help='stop when gap reaches 1e-precision', default=8)
 parser.add_argument('--exact', action="store_true")
 args=parser.parse_args()
 
@@ -30,8 +30,6 @@ setup = Setup(args.id)
 
 folder = f'results/1e-{args.precision}'
 folder += 'exact/' if args.exact else 'gersh/'
-   # check if folder exists, create it otherwise
-Path(folder).mkdir(parents=True, exist_ok=True)
 
 state_file_name = f"{folder}setup{args.id}_a_state.npz"
 time_file_name  = f"{folder}setup{args.id}_b_times.npz"
@@ -110,8 +108,7 @@ for i_dic in range(setup.nb_dic):
 
             # --- Solve slope problems ---
             params = SlopeParameters()
-            params.screening2 = GAP_Ptest(vec_gammas)
-            params.screening_it_div = 2
+            params.screening1 = GapTestAll(vec_gammas)
 
             params.max_it        = np.inf
             params.gap_stopping  = stopping_gap
@@ -119,13 +116,14 @@ for i_dic in range(setup.nb_dic):
             params.lipchitz_update = update_lip
             params.accelerated = True
             params.verbose = False
+            params.eval_gap_it = setup.eval_gap_it
             # max_eig = .np.linalg.norm(matA, 2)**2
 
             out_slope = slope_gp(vecy, matA, ratio * lbd_max, vec_gammas, params)
 
             mat_times[i_dic, i_seq, i_ratio, rep] = out_slope["time_run"]
             mat_it[i_dic, i_seq, i_ratio, rep]    = out_slope["nb_it"]
-
+            
 
             # --- Saving ---
             np.savez(time_file_name,

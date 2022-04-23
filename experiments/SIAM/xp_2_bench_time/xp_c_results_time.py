@@ -1,25 +1,24 @@
 # -*- coding: utf-8 -*-
 import argparse, sys
-from pathlib import Path
 
 import numpy as np
 
 from src import __version__
 from src.solver.slope import slope_gp
 from src.solver.parameters import SlopeParameters, EnumLipchitzOptions
-from src.screening.gap_ptest import GAP_Ptest
 from src.utils import get_lambda_max, gamma_sequence_generator
 from src.dictionaries import generate_dic
 
 from experiments.SIAM.setup import Setup
+from experiments.SIAM.slopepb import SlopePb
 
 from get_algs_params import get_alg_params, get_nb_algs
 
 
 parser=argparse.ArgumentParser()
-parser.add_argument('--id', help='setup id', type=str, default=1)
+parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 parser.add_argument('--erase', help='restart xp', action="store_true")
-parser.add_argument('--precision', help='stop when gap reaches 1e-precision')
+parser.add_argument('--precision', help='stop when gap reaches 1e-precision', default=8)
 parser.add_argument('--exact', action="store_true")
 args=parser.parse_args()
 
@@ -31,8 +30,6 @@ args=parser.parse_args()
 setup = Setup(args.id)
 folder = f'results/1e-{args.precision}'
 folder += 'exact/' if args.exact else 'gersh/'
-   # check if folder exists, create it otherwise
-Path(folder).mkdir(parents=True, exist_ok=True)
 
 state_file_name   = f"{folder}setup{args.id}_a_state.npz"
 time_file_name    = f"{folder}setup{args.id}_b_times.npz"
@@ -44,6 +41,7 @@ mat_seed  = out_state["mat_seed"]
 
 out_times = np.load(time_file_name, allow_pickle=True)
 mat_times = out_times["mat_times"]
+# mat_it    = out_times["mat_it"]
 
 
 mat_results = np.full(
@@ -51,6 +49,7 @@ mat_results = np.full(
    np.nan
 )
 
+# stopping_gap = 10**(-float(args.precision))
 update_lip   = EnumLipchitzOptions.EXACT if args.exact else EnumLipchitzOptions.GERSHGORIN
 
 # --------------------------
@@ -76,13 +75,16 @@ for i_dic in range(setup.nb_dic):
    for i_seq in range(setup.nb_sequence):
       for i_ratio, ratio in enumerate(setup.list_ratio_lbd):
 
-         stopping_time = np.mean(mat_times[i_dic, i_seq, i_ratio, :])
+         stopping_time = np.median(mat_times[i_dic, i_seq, i_ratio, :])
          if not np.any(np.isnan(mat_results[:, i_dic, i_seq, i_ratio, :])):
             t += setup.n_rep
             continue
 
          for rep in range(setup.n_rep):
             print(f"xp time {t+1} / {nb_xp}")
+
+            # print(i_dic, i_seq, i_ratio, rep)
+            # i_dic, i_seq, i_ratio, rep = 1, 0, 2, 17
 
 
             # --- set seed ---
@@ -108,20 +110,29 @@ for i_dic in range(setup.nb_dic):
             )
 
             lbd_max = get_lambda_max(vecy, matA, vec_gammas)
+            slopePb = SlopePb(matA, vecy, vec_gammas, ratio, lbdmax=lbd_max)
 
             # --- Solve slope problems ---
             list_params, _ = get_alg_params(setup, vec_gammas, args.exact)
 
 
             for i_alg, params in enumerate(list_params):
+
                if not np.isnan(mat_results[i_alg, i_dic, i_seq, i_ratio, rep]):
                   continue
 
                params.lipchitz_update = update_lip
                params.time_stopping   = stopping_time
+
                out_slope = slope_gp(vecy, matA, ratio * lbd_max, vec_gammas, params)
 
-               mat_results[i_alg, i_dic, i_seq, i_ratio, rep] = out_slope["gap"]
+               best_gap = np.min(out_slope["gap"])
+
+               vecx_hat = out_slope["sol"]
+               vecu_hat = slopePb.make_dual_scaling(vecy - matA @ vecx_hat)
+               gap      = slopePb.eval_gap(vecx_hat, vecu_hat)
+
+               mat_results[i_alg, i_dic, i_seq, i_ratio, rep] = min(gap, best_gap)
 
 
             # --- Saving ---

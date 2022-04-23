@@ -35,8 +35,19 @@ def process(folder, bool_it, setup, log=True):
       results_rho[:, :, :, :, i] = np.mean(mat_results <= vec_tau[i], axis=4)
 
 
+   # # Sparsity level
+   # sparsity_level = 100 * np.mean(mat_results_nbnz, axis=3) / setup.n
+
+   # # tim
+   # results_average_it = np.mean(mat_results_it, axis=4)
+   # results_std_it     = np.std(mat_results_it, axis=4)
+
+
    # ---- return ----
    return {
       "vec_tau": vec_tau,
       "results_rho": results_rho,
+      # "sparsity_level": sparsity_level,
+      # "results_average_it": results_average_it,
+      # "results_std_it": results_std_it,
    }

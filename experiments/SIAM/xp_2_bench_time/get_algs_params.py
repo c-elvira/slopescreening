@@ -1,12 +1,12 @@
 import numpy as np
 
-from src.solver.parameters import SlopeParameters, EnumLipchitzOptions
+from src.solver.parameters import SlopeParameters, EnumLipchitzOptions, DualScalingOptions
 
-from src.screening.singletest import GapSphereSingleTest
-from src.screening.gap_ptest import GAP_Ptest
-from src.screening.kappa_test import Kappa_test
+from src.screening.gap_test_p_q import GapTestPequalQ
+from src.screening.gap_test_all import GapTestAll
 
-nb_algs = 3
+
+nb_algs = 4
 
 def get_nb_algs(setup):
 
@@ -19,36 +19,37 @@ def get_alg_params(setup, vec_gammas, exact):
    list_names  = []
 
    # --- 1. Xp ---
-      # 1a. No screening
-   params1 = SlopeParameters()
 
+      # -- 1a. No screening
+   params1 = SlopeParameters()
+   params1.eval_gap = False
    list_params.append(params1)
    list_names.append("no screening")
 
 
+      # -- 1b. Strategy p_q=q
    params2 = SlopeParameters()
-
-   if exact:
-      params2.screening2 = GapSphereSingleTest()
-      params2.screening_it_div = 2.
-
-   else:
-      params2.screening1 = GapSphereSingleTest()
-
+   params2.screening1 = GapTestPequalQ()
+   params2.eval_gap_it = setup.eval_gap_it
    list_params.append(params2)
-   list_names.append("single test")
+   list_names.append("p_q=q")
 
-      # 1c. Single test screening
+
+      # -- 1c. Strategy all
    params3 = SlopeParameters()
-
-   params3.screening2 = GAP_Ptest(vec_gammas)
-   params3.screening_it_div = 2.
-
-   if not exact:
-      params3.screening1 = GapSphereSingleTest()
-
+   params3.screening1 = GapTestAll(vec_gammas)
+   params3.eval_gap_it = setup.eval_gap_it
    list_params.append(params3)
-   list_names.append("p-test")
+   list_names.append("test-all")
+
+
+   # -- 1d. Bao et al.
+   params4 = SlopeParameters()
+   params4.screening1 = GapTestPequalQ()
+   params4.dual_scaling = DualScalingOptions.BAO_ET_AL
+   params4.eval_gap_it = setup.eval_gap_it
+   list_params.append(params4)
+   list_names.append("Bao-et-al")
 
 
    # --- 2. Common parameters ---
