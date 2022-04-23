@@ -1,4 +1,4 @@
-*.npz
-*.csv
+*.eps
+*.pdf
 
-xp_old*
+*.npz
