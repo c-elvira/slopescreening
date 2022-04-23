@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+from pathlib import Path
 
 import numpy as np
 
@@ -170,6 +171,9 @@ for i_seq in range(3):
 # exit()
 
 if args.save:
-   filename = f"figs/xp0_{setup_oscar.list_dic[i_dic]}.eps"
+   folderfig = "figs"
+   Path(folderfig).mkdir(parents=True, exist_ok=True)
+
+   filename = folderfig + f"/xp0_{setup_oscar.list_dic[i_dic]}.eps"
    # plt.rcParams['pdf.fonttype'] = 42
    plt.savefig(filename, bbox_inches='tight')

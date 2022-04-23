@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+from pathlib import Path
 
 import numpy as np
 
@@ -132,7 +133,10 @@ ax.set_xlim([1e-6, 1e0])
 ax.set_ylim([-2, 102])
 
 if args.save:
-   filename = f"figs/xp_illustration_screening{args.i_seq}.eps"
+   folderfig = "figs"
+   Path(folderfig).mkdir(parents=True, exist_ok=True)
+
+   filename = folderfig + f"/xp_illustration_screening{args.i_seq}.eps"
    plt.savefig(filename, bbox_inches='tight')
 
 if not args.noshow:

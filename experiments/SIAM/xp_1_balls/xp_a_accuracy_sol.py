@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time, argparse, sys
+from pathlib import Path
 
 import numpy as np
 
@@ -33,6 +34,7 @@ args=parser.parse_args()
 # -------------------------
 
 setup = Setup(args.id)
+Path("results").mkdir(parents=True, exist_ok=True)
 out_file_name = f"results/xp_setup{args.id}.npz"
 
 mat_seed = np.random.randint(
