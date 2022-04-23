@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-from pathlib import Path
 
 import numpy as np
 
@@ -10,10 +9,9 @@ from src.dictionaries import generate_dic
 from src.utils import get_lambda_max, gamma_sequence_generator
 
 # Screening
-from src.screening.gap_rqtest import GAP_RQtest
-from src.screening.kappa_test import Kappa_test
-from src.screening.singletest import GapSphereSingleTest
-from src.screening.gap_ptest import GAP_Ptest
+from src.screening.gap_test_p_1 import GapTestPequalOne
+from src.screening.gap_test_p_q import GapTestPequalQ
+from src.screening.gap_test_all import GapTestAll
 
 # XP import
 from experiments.SIAM.slopepb import SlopePb
@@ -103,13 +101,11 @@ for i_dic in range(setup.nb_dic):
 
             # ---- 3c. Testing sphere ---- 
             list_tests = [
-               # GAP_RQtest(vec_gammas, 1 + np.arange(setup.n)),
-               Kappa_test(vec_gammas, np.arange(setup.n, dtype=float)),
-               GapSphereSingleTest(),
-               GAP_Ptest(vec_gammas),
+               GapTestPequalOne(vec_gammas, np.arange(setup.n, dtype=np.double)),
+               GapTestPequalQ(),
+               GapTestAll(vec_gammas),
             ]
             assert(len(list_tests) == NB_TEST)
-
 
             for i_offset, offset in enumerate(xpparams.vec_offsets):
                for i_test, test in enumerate(list_tests):

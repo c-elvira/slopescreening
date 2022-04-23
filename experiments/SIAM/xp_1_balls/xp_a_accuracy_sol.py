@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import time, argparse, sys
-from pathlib import Path
 
 import numpy as np
 
@@ -14,8 +13,7 @@ from src.utils import get_lambda_max, gamma_sequence_generator
 from src.dictionaries import generate_dic
 
 # Screening
-from src.screening.singletest import GapSphereSingleTest
-from src.screening.gap_ptest import GAP_Ptest
+from src.screening.gap_test_all import GapTestAll
 
 # XP import
 from experiments.SIAM.slopepb import SlopePb
@@ -26,7 +24,7 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--erase', help='erase existing results', action="store_true")
 parser.add_argument('--continue', help='save figure', action="store_true", dest="cont")
 parser.add_argument('--id', help='setup id', type=str,
-    default="1a")
+    default=1)
 args=parser.parse_args()
 
 
@@ -35,10 +33,7 @@ args=parser.parse_args()
 # -------------------------
 
 setup = Setup(args.id)
-folder = "results/"
-Path(folder).mkdir(parents=True, exist_ok=True)
-
-out_file_name = folder + f"/xp_setup{args.id}.npz"
+out_file_name = f"results/xp_setup{args.id}.npz"
 
 mat_seed = np.random.randint(
    0, 2**32-1,
@@ -131,19 +126,21 @@ for i_dic in range(setup.nb_dic):
                params.max_it = 1e7
                params.gap_stopping = xpparams.stopping_gap
                params.time_stopping = np.inf
-               params.screening1 = GapSphereSingleTest()
-               params.screening2 = GAP_Ptest(vec_gammas)
-               params.screening_it_div = 2.
+               params.screening1 = GapTestAll(vec_gammas)
+               params.eval_gap   = True
+               params.eval_gap_it = setup.eval_gap_it
                params.accelerated = True
                params.verbose = False
                
                out_slope = slope_gp(vecy, matA, ratio * lbd_max, vec_gammas, params)
 
-               gap = slopePb.eval_gap(out_slope["sol"], out_slope["dualsol"])
+               dv  = vecy - matA @  out_slope["sol"]
+               dv = slopePb.make_dual_scaling(dv)
+               gap = slopePb.eval_gap(out_slope["sol"], dv)
 
                if gap <= gap_old:
                   mat_pvopt[i_dic, i_seq, i_ratio, rep, :] = out_slope["sol"]
-                  mat_dvopt[i_dic, i_seq, i_ratio, rep, :] = out_slope["dualsol"]
+                  mat_dvopt[i_dic, i_seq, i_ratio, rep, :] = dv
 
                   # Save
                   np.savez(out_file_name,

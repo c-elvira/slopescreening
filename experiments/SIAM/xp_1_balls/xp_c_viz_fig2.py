@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
-from decimal import Decimal
-import json, argparse
-from pathlib import Path
+import argparse
 
 import numpy as np
 
 # XP import
 from experiments.SIAM.slopepb import SlopePb
 from experiments.SIAM.setup import Setup
-from experiments.SIAM.xp_1_balls import xpparams
-from experiments.SIAM.xp_1_balls.process_data import process
+
+import xpparams
+from process_data import process
 
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--noshow', help='do not display figures', action="store_true")
 parser.add_argument('--save', help='save figure', action="store_true")
-# parser.add_argument('--id', help='setup id', type=str, default=1)
+parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 args=parser.parse_args()
 
 import matplotlib
@@ -26,14 +25,15 @@ else:
 import matplotlib.pyplot as plt
 from matplotlib.legend_handler import HandlerBase
 import matplotlib.font_manager as font_manager
-
+# print(matplotlib.get_backend())
+# matplotlib.rc('pdf', fonttype=42)
 
 # -------------------------
 #        Load Results
 # -------------------------
 
 # OSCAR
-setup_oscar = Setup("1a")
+setup_oscar = Setup(args.id)
 dic_process_oscar = process(setup_oscar)
 
 mat_pc_detected_oscar = dic_process_oscar["mat_pc_detected"]
@@ -153,7 +153,7 @@ f.tight_layout()
 
 
 for i_seq in range(3):
-   ax[i_seq].set_xlabel("$R$", fontproperties=font_math, fontsize=fs_ylabels+6)
+   ax[i_seq].set_xlabel("$R_0$", fontproperties=font_math, fontsize=fs_ylabels+6)
 
    # ax[1, i_seq].xaxis.set_major_locator(plt.MaxNLocator(6))
 
@@ -164,6 +164,10 @@ for i_seq in range(3):
    for tick in ax[i_seq].yaxis.get_major_ticks():
       tick.label.set_fontproperties(font_math)
       tick.label.set_fontsize(22)
+
+
+# plt.show()
+# exit()
 
 if args.save:
    filename = f"figs/xp0_{setup_oscar.list_dic[i_dic]}.eps"
