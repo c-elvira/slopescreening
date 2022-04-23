@@ -45,7 +45,6 @@ class SlopeParameters(object):
 
    screening1: AbstractGapScreening = None
    screening2: AbstractGapScreening = None
-   screening_it_div: float = 2.
 
    save_nactive: bool = False
    save_pfunc:  bool = False

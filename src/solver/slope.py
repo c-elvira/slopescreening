@@ -130,13 +130,6 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
    is_test_1 = False if screening_test_1 is None else True
    is_test_2 = False if screening_test_2 is None else True
 
-   gap_last_test = np.inf
-   if is_test_2:
-      do_test2 = lambda g, g_last: g <= g_last / algParameters.screening_it_div
-      gap_tresh = algParameters.screening_it_div
-      # do_test2 = lambda g, g_last: g <= gap_tresh and g_last > gap_tresh
-   else:
-      do_test2 = lambda g, g_last: False
 
    # -------------------------
    #          Loop
@@ -259,26 +252,7 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
          # gap = np.abs(best_costfunc - vec_dual_func[-1])
 
          # 1. Apply test
-         if is_test_2: # and do_test2(gap, gap_last_test):
-            out_test2 = screening_test_2.apply_test(np.abs(neg_grad), gap, lbd, vecgamma[:n_active], coeff_dual_scaling=coeff_dual_scaling, index=index_sort_neg_grad)
-
-            if np.any(out_test2):
-               # 2a. Set entry to 0
-               vecx_hat[ind_active[out_test2]] = 0.
-
-               # 2b. Reduce set of active indices
-               neg_grad   = neg_grad[np.bitwise_not(out_test2)]
-               ind_active = ind_active[np.bitwise_not(out_test2)]
-               nb_screen  = np.sum(out_test2)
-               n_active  -= nb_screen
-
-               gamma_returned = gamma_returned[nb_screen:]
-
-               # schedule next test
-               gap_last_test = float(gap)
-               lip = update_Lip()
-
-         elif is_test_1:
+         if is_test_1:
             out_test1 = screening_test_1.apply_test(np.abs(neg_grad), gap, lbd, vecgamma[:n_active], coeff_dual_scaling=coeff_dual_scaling, index=index_sort_neg_grad)
             
             if np.any(out_test1):
@@ -290,6 +264,22 @@ def slope_gp(vecy, matA, lbd, vecgamma, algParameters=SlopeParameters()):
                ind_active     = ind_active[np.bitwise_not(out_test1)]
                nb_screen      = np.sum(out_test1)
                n_active      -= nb_screen 
+
+               gamma_returned = gamma_returned[nb_screen:]
+               lip = update_Lip()
+
+         if is_test_2:
+            out_test2 = screening_test_2.apply_test(np.abs(neg_grad), gap, lbd, vecgamma[:n_active], coeff_dual_scaling=coeff_dual_scaling, index=index_sort_neg_grad)
+
+            if np.any(out_test2):
+               # 2a. Set entry to 0
+               vecx_hat[ind_active[out_test2]] = 0.
+
+               # 2b. Reduce set of active indices
+               neg_grad   = neg_grad[np.bitwise_not(out_test2)]
+               ind_active = ind_active[np.bitwise_not(out_test2)]
+               nb_screen  = np.sum(out_test2)
+               n_active  -= nb_screen
 
                gamma_returned = gamma_returned[nb_screen:]
                lip = update_Lip()
