@@ -10,6 +10,9 @@ class AbstractGapScreening(ABC):
       super(AbstractGapScreening, self).__init__()
 
       self.name = "NONAME"
+
+   def get_name(self):
+      return self.name
    
 
    @abstractmethod

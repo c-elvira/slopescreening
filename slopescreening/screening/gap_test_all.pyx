@@ -54,6 +54,12 @@ cdef class GapTestAll:
 
 
    @cython.boundscheck(False) # turn off bounds-checking for entire function
+   @cython.wraparound(False)  # turn off negative index wrapping for entire function
+   def get_name(self):
+      return self.name
+
+
+   @cython.boundscheck(False) # turn off bounds-checking for entire function
    # @cython.wraparound(False)  # turn off negative index wrapping for entire function
    def apply_test(self, 
       np.ndarray[np.npy_double, ndim=1] Atcabs, 

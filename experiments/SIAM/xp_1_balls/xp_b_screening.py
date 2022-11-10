@@ -21,6 +21,7 @@ from experiments.SIAM.xp_1_balls import xpparams
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--id', help='setup id', type=str, default=1)
+parser.add_argument('--noverbose', help='disable printing if true', action="store_true")
 args=parser.parse_args()
 
 # -------------------------
@@ -38,7 +39,8 @@ try:
    mat_dvopt = load_results["mat_dvopt"]
 
 except FileNotFoundError:
-   print("No result found")
+   if not args.noverbose:
+      print("No result found")
    sys.exit(1)
 
 
@@ -88,7 +90,8 @@ for i_dic in range(setup.nb_dic):
          # ---- 3. XP ----
          for i_ratio, ratio in enumerate(setup.list_ratio_lbd):
             i_xp += 1
-            print(f"xp {i_xp} / {nb_xp}")
+            if not args.noverbose:
+               print(f"xp {i_xp} / {nb_xp}")
 
             slopePb = SlopePb(matA, vecy, vec_gammas, ratio, lbdmax=lbd_max)
             vecx_hat = mat_pvopt[i_dic, i_seq, i_ratio, rep, :]

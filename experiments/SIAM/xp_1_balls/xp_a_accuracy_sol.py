@@ -24,8 +24,8 @@ from experiments.SIAM.xp_1_balls import xpparams
 parser=argparse.ArgumentParser()
 parser.add_argument('--erase', help='erase existing results', action="store_true")
 parser.add_argument('--continue', help='save figure', action="store_true", dest="cont")
-parser.add_argument('--id', help='setup id', type=str,
-    default=1)
+parser.add_argument('--id', help='setup id', type=str, default=1)
+parser.add_argument('--noverbose', help='disable printing if true', action="store_true")
 args=parser.parse_args()
 
 
@@ -115,7 +115,8 @@ for i_dic in range(setup.nb_dic):
             vecu_hat = mat_dvopt[i_dic, i_seq, i_ratio, rep, :]
 
             gap = slopePb.eval_gap(vecx_hat, vecu_hat)
-            print(f"xp {i_xp} / {nb_xp} --- (gap={gap})")
+            if not args.noverbose:
+               print(f"xp {i_xp} / {nb_xp} --- (gap={gap})")
 
             if (gap > xpparams.stopping_gap):
                gap_old = gap

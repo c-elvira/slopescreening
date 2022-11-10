@@ -29,11 +29,11 @@
 		]
 	},
 
-	"setup1b": {
-		"remark": "EXP 1, 2, 3",
+	"setupTest": {
+		"remark": "Short experiment to test the package",
 
-		"m": 100,
-		"n": 300,
+		"m": 5,
+		"n": 15,
 
 		"dictionaries": [
 			"gaussian 0.",
@@ -42,18 +42,16 @@
 		],
 		"normalize": true,
 
-		"n_rep": 50,
+		"n_rep": 10,
 
 		"eval_gap_it": 20,
 
 		"sequences": [
    			["exp-lim", 0.99999, 0.9],
-   			["exp-lim", 0.99999, 0.5],
    			["exp-lim", 0.99999, 1e-2]
 		],
 
 		"list_ratio_lbd": [
-			0.3, 
 			0.5, 
 			0.8
 		]

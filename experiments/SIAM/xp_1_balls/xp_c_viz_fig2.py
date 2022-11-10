@@ -14,6 +14,7 @@ from process_data import process
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--noshow', help='do not display figures', action="store_true")
+parser.add_argument('--noverbose', help='disable printing if true', action="store_true")
 parser.add_argument('--save', help='save figure', action="store_true")
 parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 args=parser.parse_args()
@@ -167,8 +168,9 @@ for i_seq in range(3):
       tick.label.set_fontsize(22)
 
 
-# plt.show()
-# exit()
+if not args.noshow:
+   plt.show()
+
 
 if args.save:
    folderfig = "figs"
