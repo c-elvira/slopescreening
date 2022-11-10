@@ -19,7 +19,8 @@ def process(setup, log=True):
 
    mat_nb_zero_detected = screenings['mat_nb_zero_detected']
    nb_test = mat_nb_zero_detected.shape[0]
-   list_tests = screenings["list_test"]
+   list_tests   = screenings["list_test"]
+   list_legends = screenings["list_legends"]
 
    # ---- log ----
    if log:
@@ -48,6 +49,7 @@ def process(setup, log=True):
    return {
       "mat_pc_detected": np.mean(mat_pc_detected, axis=5),
       "list_tests": list_tests,
+      "list_legends": list_legends,
    }
 
    # {

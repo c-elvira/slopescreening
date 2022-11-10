@@ -19,6 +19,9 @@ parser.add_argument('--save', help='save figure', action="store_true")
 parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 args=parser.parse_args()
 
+if args.id != "SIAM":
+   raise Exception("this file has been created to reproduce the SIAM figures. Use the SIAM id instead")
+
 import matplotlib
 if args.noshow:
    matplotlib.use("ps")
@@ -52,6 +55,7 @@ list_tests_oscar      = dic_process_oscar["list_tests"]
 
 i_dic = 0
 i_lbd = 1
+n_lbd = len(setup_oscar.list_ratio_lbd)
 
 fs=22
 fs_ylabels = 20
@@ -104,7 +108,7 @@ font_ttt = font_manager.FontProperties(
    size=fs+6
 )
 
-f, ax = plt.subplots(1, 3, figsize=(18, 6), sharex=True, sharey=True)
+f, ax = plt.subplots(1, n_lbd, figsize=(18, 6), sharex=True, sharey=True)
 
 
 for i_seq, _ in enumerate(setup_oscar.list_sequence):
@@ -120,7 +124,7 @@ for i_seq, _ in enumerate(setup_oscar.list_sequence):
          tick.label.set_fontsize(18)
 
       
-      for i_lbd in range(3):
+      for i_lbd in range(n_lbd):
          ax[i_seq].plot(
             xpparams.vec_offsets, 
             100 * mat_pc_detected_oscar[i_test, :, i_dic, i_seq, i_lbd],
@@ -144,7 +148,7 @@ ax[0].set_ylabel(
    fontsize=fs_ylabels+6,
 )
 
-ax[0].legend([object, object, object], ['$\\lambda / \\lambda_{\\max}=' + str(x) + '$' for x in [.3, .5, .8]],
+ax[0].legend([object, object, object], ['$\\lambda / \\lambda_{\\max}=' + str(x) + '$' for x in setup_oscar.list_ratio_lbd],
            handler_map={object: AnyObjectHandler()},
            prop=font_math
 )

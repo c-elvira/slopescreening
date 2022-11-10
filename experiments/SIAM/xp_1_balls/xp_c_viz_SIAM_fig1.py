@@ -20,6 +20,11 @@ parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 parser.add_argument('--i_seq', type=int, default=0)
 args=parser.parse_args()
 
+
+if args.id != "SIAM":
+   raise Exception("this file has been created to reproduce the SIAM figures. Use the SIAM id instead")
+
+
 import matplotlib
 if args.noshow:
    matplotlib.use('PS')
@@ -84,12 +89,14 @@ i_lbd = 1
 fs=22
 fs_ylabels = 20
 list_colors  = ["tab:blue", "tab:orange", "tab:green"]
-list_legends = ["$p_q=q\\;\\forall q$", "all", "$p_q=1\\;\\forall q$"]
+list_legends = dic_process_oscar["list_legends"]
+# list_legends = ["$p_q=q\\;\\forall q$", "all", "$p_q=1\\;\\forall q$"]
 # "best $r_q \\;\\forall q$ "
 
-print("printing xp_0_ball parameters with")
-print(f"- {setup_oscar.list_dic[i_dic]} dictionary")
-print(f"- lbd / lbd_max = {setup_oscar.list_ratio_lbd[i_lbd]}")
+if not args.noverbose:
+   print("printing xp_0_ball parameters with")
+   print(f"- {setup_oscar.list_dic[i_dic]} dictionary")
+   print(f"- lbd / lbd_max = {setup_oscar.list_ratio_lbd[i_lbd]}")
 
 
 f, ax = plt.subplots(1, 1, figsize=(.7*16, .6*9), sharex=True, sharey=True)

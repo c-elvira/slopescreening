@@ -120,7 +120,8 @@ for i_dic in range(setup.nb_dic):
          np.savez(
             screening_filename,
             mat_nb_zero_detected=mat_nb_zero_detected,
-            list_test = [test.get_name() for test in list_tests],
+            list_test    = [test.get_name() for test in list_tests],
+            list_legends = [test.get_legend_name() for test in list_tests],
             version = __version__,
             allow_pickle=True
          )

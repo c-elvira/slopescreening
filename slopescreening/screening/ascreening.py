@@ -9,11 +9,14 @@ class AbstractGapScreening(ABC):
    def __init__(self):
       super(AbstractGapScreening, self).__init__()
 
-      self.name = "NONAME"
+      self.name = "void"
+      self.legend_name = "void"
 
    def get_name(self):
       return self.name
    
+   def get_legend_name(self):
+      return self.legend_name
 
    @abstractmethod
    def apply_test(self, Atu_abs, gap, lbd, vec_gammas, coeff_dual_scaling=1., offset_radius=0, index=None) -> np.ndarray:

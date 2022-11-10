@@ -11,6 +11,7 @@ class GapTestPequalQ(AbstractGapScreening):
       super(GapTestPequalQ, self).__init__()
 
       self.name = "Gap test p=q"
+      self.legend_name = "$p_q=q\\;\\forall q$"
 
    def apply_test(self, Atu_abs, gap, lbd, vec_gammas, coeff_dual_scaling=1., offset_radius=0, index=None) -> np.ndarray:
       """ GAP Sphere screening test detailed in Cédric's node
