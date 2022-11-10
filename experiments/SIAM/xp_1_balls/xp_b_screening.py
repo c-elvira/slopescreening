@@ -4,14 +4,14 @@ import argparse
 import numpy as np
 
 # Algorithm import
-from src import __version__
-from src.dictionaries import generate_dic
-from src.utils import get_lambda_max, gamma_sequence_generator
+from slopescreening import __version__
+from slopescreening.dictionaries import generate_dic
+from slopescreening.utils import get_lambda_max, gamma_sequence_generator
 
 # Screening
-from src.screening.gap_test_p_1 import GapTestPequalOne
-from src.screening.gap_test_p_q import GapTestPequalQ
-from src.screening.gap_test_all import GapTestAll
+from slopescreening.screening.gap_test_p_1 import GapTestPequalOne
+from slopescreening.screening.gap_test_p_q import GapTestPequalQ
+from slopescreening.screening.gap_test_all import GapTestAll
 
 # XP import
 from experiments.SIAM.slopepb import SlopePb

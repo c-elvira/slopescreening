@@ -1,9 +1,9 @@
 import numpy as np
 
-from src.solver.parameters import SlopeParameters, EnumLipchitzOptions, DualScalingOptions
+from slopescreening.solver.parameters import SlopeParameters, EnumLipchitzOptions, DualScalingOptions
 
-from src.screening.gap_test_p_q import GapTestPequalQ
-from src.screening.gap_test_all import GapTestAll
+from slopescreening.screening.gap_test_p_q import GapTestPequalQ
+from slopescreening.screening.gap_test_all import GapTestAll
 
 
 nb_algs = 4

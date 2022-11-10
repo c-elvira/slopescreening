@@ -4,7 +4,7 @@ import enum
 
 import numpy as np
 
-from src.screening.ascreening import AbstractGapScreening
+from slopescreening.screening.ascreening import AbstractGapScreening
 
 
 class EnumLipchitzOptions(enum.Enum):

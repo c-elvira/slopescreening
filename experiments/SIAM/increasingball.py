@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 
-from src.utils import get_lambda_max
+from slopescreening.utils import get_lambda_max
 
 
 def test_increasing_ball(list_tests, vec_offsets, slopepb, vecx):

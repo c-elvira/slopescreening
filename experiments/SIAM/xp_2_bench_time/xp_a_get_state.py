@@ -3,7 +3,7 @@ import argparse, sys
 from pathlib import Path
 import numpy as np
 
-from src import __version__
+from slopescreening import __version__
 
 from experiments.SIAM.setup import Setup
 from get_algs_params import get_alg_params, get_nb_algs

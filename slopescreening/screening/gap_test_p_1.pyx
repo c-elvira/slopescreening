@@ -2,7 +2,7 @@
 # Based on https://cython.readthedocs.io/en/latest/src/tutorial/numpy.html
 import numpy as np
 
-from src.screening.ascreening import AbstractGapScreening
+from slopescreening.screening.ascreening import AbstractGapScreening
 
 
 # "cimport" is used to import special compile-time information

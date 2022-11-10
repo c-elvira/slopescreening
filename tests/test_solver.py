@@ -2,10 +2,10 @@
 import unittest
 import numpy as np
 
-import src.utils as utils
-from src.dictionaries import generate_dic
-from src.solver.slope import slope_gp
-from src.solver.parameters import SlopeParameters
+import slopescreening.utils as utils
+from slopescreening.dictionaries import generate_dic
+from slopescreening.solver.slope import slope_gp
+from slopescreening.solver.parameters import SlopeParameters
 
 
 class TestSolver(unittest.TestCase):

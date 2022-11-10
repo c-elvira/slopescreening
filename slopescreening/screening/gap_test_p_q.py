@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 
-from src.screening.ascreening import AbstractGapScreening
+from slopescreening.screening.ascreening import AbstractGapScreening
 
 
 class GapTestPequalQ(AbstractGapScreening):

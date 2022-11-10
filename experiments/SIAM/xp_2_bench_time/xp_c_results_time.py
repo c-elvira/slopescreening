@@ -3,11 +3,11 @@ import argparse, sys
 
 import numpy as np
 
-from src import __version__
-from src.solver.slope import slope_gp
-from src.solver.parameters import SlopeParameters, EnumLipchitzOptions
-from src.utils import get_lambda_max, gamma_sequence_generator
-from src.dictionaries import generate_dic
+from slopescreening import __version__
+from slopescreening.solver.slope import slope_gp
+from slopescreening.solver.parameters import SlopeParameters, EnumLipchitzOptions
+from slopescreening.utils import get_lambda_max, gamma_sequence_generator
+from slopescreening.dictionaries import generate_dic
 
 from experiments.SIAM.setup import Setup
 from experiments.SIAM.slopepb import SlopePb

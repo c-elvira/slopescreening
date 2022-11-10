@@ -3,8 +3,8 @@ import time
 
 import numpy as np
 
-from src.solver.parameters import SlopeParameters, EnumLipchitzOptions, DualScalingOptions
-from src.solver.prox import prox_owl
+from slopescreening.solver.parameters import SlopeParameters, EnumLipchitzOptions, DualScalingOptions
+from slopescreening.solver.prox import prox_owl
 
 
 def primal_func(vecy, Ax, x, lbd, vec_gammas) -> float:

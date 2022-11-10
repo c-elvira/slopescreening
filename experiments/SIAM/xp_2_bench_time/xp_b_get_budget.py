@@ -3,13 +3,13 @@ import argparse, sys
 
 import numpy as np
 
-from src import __version__
-from src.solver.slope import slope_gp
-from src.utils import get_lambda_max, gamma_sequence_generator
-from src.dictionaries import generate_dic
+from slopescreening import __version__
+from slopescreening.solver.slope import slope_gp
+from slopescreening.utils import get_lambda_max, gamma_sequence_generator
+from slopescreening.dictionaries import generate_dic
 
-from src.solver.parameters import SlopeParameters, EnumLipchitzOptions
-from src.screening.gap_test_all import GapTestAll
+from slopescreening.solver.parameters import SlopeParameters, EnumLipchitzOptions
+from slopescreening.screening.gap_test_all import GapTestAll
 
 from experiments.SIAM.setup import Setup
 

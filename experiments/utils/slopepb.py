@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.slope import primal_func, dual_func
-from src.utils import get_lambda_max
+from slopescreening.slope import primal_func, dual_func
+from slopescreening.utils import get_lambda_max
 
 
 class SlopePb(object):

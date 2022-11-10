@@ -5,16 +5,16 @@ from pathlib import Path
 import numpy as np
 
 # Algorithm import
-from src import __version__
-from src.solver.parameters import SlopeParameters, EnumLipchitzOptions
-from src.solver.slope import primal_func, dual_func, slope_gp
+from slopescreening import __version__
+from slopescreening.solver.parameters import SlopeParameters, EnumLipchitzOptions
+from slopescreening.solver.slope import primal_func, dual_func, slope_gp
 
 # Generative models
-from src.utils import get_lambda_max, gamma_sequence_generator
-from src.dictionaries import generate_dic
+from slopescreening.utils import get_lambda_max, gamma_sequence_generator
+from slopescreening.dictionaries import generate_dic
 
 # Screening
-from src.screening.gap_test_all import GapTestAll
+from slopescreening.screening.gap_test_all import GapTestAll
 
 # XP import
 from experiments.SIAM.slopepb import SlopePb
