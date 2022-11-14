@@ -12,8 +12,9 @@ from get_algs_params import get_alg_params, get_nb_algs
 parser=argparse.ArgumentParser()
 parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 parser.add_argument('--erase', help='restart xp', action="store_true")
-parser.add_argument('--precision', help='stop when gap reaches 1e-precision', default=8, type=float)
+parser.add_argument('--precision', help='stop when gap reaches 1e-precision', default=8, type=int)
 parser.add_argument('--exact', action="store_true")
+parser.add_argument('--noverbose', help='disable printing if true', action="store_true")
 args=parser.parse_args()
 
 setup = Setup(args.id)
@@ -27,8 +28,9 @@ Path(folder).mkdir(parents=True, exist_ok=True)
 
 time_file_name = f"{folder}/setup{args.id}_a_state.npz"
 
+if not args.noverbose:
+   print(f"Starting \"get seed\" with id {args.id}, precision 1e-{args.precision}")
 
-print(f"Starting \"get seed\" with id {args.id}, precision 1e-{args.precision}")
 try:
    if args.erase:
       raise FileNotFoundError

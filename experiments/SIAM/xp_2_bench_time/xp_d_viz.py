@@ -10,9 +10,10 @@ parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 parser.add_argument('--precision', help='stop when gap reaches 1e-precision', default=8)
 parser.add_argument('--exact', action="store_true")
 # parser.add_argument('--it', help='show it results', action="store_true")
-parser.add_argument('--ilbd', help='save figure', type=int, default=1)
+parser.add_argument('--ilbd', help='save figure', type=int, default=0)
 parser.add_argument('--noshow', help='show plots', action="store_true")
 parser.add_argument('--save', help='save figure', action="store_true")
+parser.add_argument('--noverbose', help='disable printing if true', action="store_true")
 args=parser.parse_args()
 
 import matplotlib
@@ -21,39 +22,18 @@ if args.noshow:
 else:
    matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as font_manager
+
+matplotlib.rcParams['text.usetex'] = True
+
+
 
 from process_data import process
 from get_algs_params import get_alg_params, get_nb_algs
-from src.utils import gamma_sequence_generator
+from slopescreening.utils import gamma_sequence_generator
 from experiments.SIAM.setup import Setup
 
 
 fs = 20
-
-font_math = font_manager.FontProperties(
-   fname='../fonts/cmunrm.ttf',
-   # weight='normal',
-   # style='normal',
-   math_fontfamily="cm",
-   size=fs+2
-)
-
-font_text = font_manager.FontProperties(
-   fname='../fonts/cmunrm.ttf',
-   # weight='normal',
-   # style='normal',
-   math_fontfamily="cm",
-   size=fs+2
-)
-
-font_ttt = font_manager.FontProperties(
-   # fname='../fonts/ectt1000.ttf',
-   fname='../fonts/cmuntt.ttf',
-   weight='bold',
-   style='normal',
-   size=fs
-)
 
 # -------------------------
 #       Load  results
@@ -87,9 +67,10 @@ list_algnames = ["PG-no", "PG-p=q", "PG-all", 'PG-Bao']
 list_dicname  = ["Gaussian", "Uniform", "Toeplitz"]
 # args.ilbd = 1
 
-print("ploting time fig for")
-print(f" - {list_dicname} dictionaries")
-print(f" - lbd / lbd_max = {setup.list_ratio_lbd[args.ilbd]}")
+if not args.noverbose:
+   print("ploting time fig for")
+   print(f" - {list_dicname} dictionaries")
+   print(f" - lbd / lbd_max = {setup.list_ratio_lbd[args.ilbd]}")
 
 for i_dic in range(setup.nb_dic):   
    for i_seq in range(setup.nb_sequence):
@@ -115,31 +96,27 @@ for i_dic in range(setup.nb_dic):
          ax[i_seq, i_dic].set_title(
             f"{list_dicname[i_dic]}",
             fontsize=fs+2,
-            fontproperties=font_text
          )
             
       if i_dic == 2 and i_seq == 2:
-         ax[i_seq, i_dic].legend(prop=font_ttt)
+         ax[i_seq, i_dic].legend()
 
       if i_seq == setup.nb_sequence-1:
-         ax[i_seq, i_dic].set_xlabel("$\\delta$ (Dual gap)", 
+         ax[i_seq, i_dic].set_xlabel("$\delta$ (Dual gap)", 
             # fontsize=14,
-            fontproperties=font_text)
+         )
 
       if i_dic == 0:
          ax[i_seq, i_dic].set_ylabel(
-            r"$\rho_{\ttsolv}(\delta)$",
+            r"$\rho(\delta)$",
             fontsize=fs+4,
-            fontproperties=font_math
          )
 
          for tick in ax[i_seq, i_dic].yaxis.get_major_ticks():
-            tick.label.set_fontproperties(font_math)
             tick.label.set_fontsize(16) 
 
       if i_seq == 2:
          for tick in ax[i_seq, i_dic].xaxis.get_major_ticks():
-            tick.label.set_fontproperties(font_math)
             tick.label.set_fontsize(16)
 
 

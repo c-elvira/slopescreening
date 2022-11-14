@@ -20,6 +20,7 @@ parser.add_argument('--id', help='setup id', type=str, default="SIAM")
 parser.add_argument('--erase', help='restart xp', action="store_true")
 parser.add_argument('--precision', help='stop when gap reaches 1e-precision', default=8)
 parser.add_argument('--exact', action="store_true")
+parser.add_argument('--noverbose', help='disable printing if true', action="store_true")
 args=parser.parse_args()
 
 
@@ -70,7 +71,8 @@ except FileNotFoundError:
 
 nb_xp = setup.nb_dic * setup.nb_sequence * setup.nb_ratio_lbd * setup.n_rep
 t = 0
-print(f"Starting \"xp time\" with id {args.id}, precision 1e-{args.precision}")
+if not args.noverbose:
+   print(f"Starting \"xp time\" with id {args.id}, precision 1e-{args.precision}")
 for i_dic in range(setup.nb_dic):
    for i_seq in range(setup.nb_sequence):
       for i_ratio, ratio in enumerate(setup.list_ratio_lbd):
@@ -81,7 +83,8 @@ for i_dic in range(setup.nb_dic):
             continue
 
          for rep in range(setup.n_rep):
-            print(f"xp time {t+1} / {nb_xp}")
+            if not args.noverbose:
+               print(f"xp time {t+1} / {nb_xp}")
 
             # print(i_dic, i_seq, i_ratio, rep)
             # i_dic, i_seq, i_ratio, rep = 1, 0, 2, 17
