@@ -70,17 +70,13 @@ if you want it editable.
 
 ## Running the experiments
 
+To reproduce the two experiments from the paper, one can simply run the launcher in the corresponding folder:
 ```bash
-cd experiments/SIAM
-python exp.py
-python vizu.py
+cd experiments/SIAM/exp_name
+chmod a+x launcher.sh # make sure that the script is executable
+./launcher.sh
 ```
-or
-```bash
-python python vizu.py --save
-```
-if you want to save the plot.
-
+where `exp_name` is either `xp_1_balls` or `xp_2_bench_time`.
 
 
 ## Licence
