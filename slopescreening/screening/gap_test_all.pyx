@@ -30,7 +30,7 @@ cdef class GapTestAll:
    def __init__(
       self, np.ndarray[np.npy_double, ndim=1] vec_gammas
    ):
-      
+
       cdef int n = vec_gammas.shape[0]
       cdef int i
 
@@ -65,19 +65,19 @@ cdef class GapTestAll:
 
    @cython.boundscheck(False) # turn off bounds-checking for entire function
    # @cython.wraparound(False)  # turn off negative index wrapping for entire function
-   def apply_test(self, 
-      np.ndarray[np.npy_double, ndim=1] Atcabs, 
-      double gap, 
-      double lbd, 
+   def apply_test(self,
+      np.ndarray[np.npy_double, ndim=1] Atcabs,
+      double gap,
+      double lbd,
       np.ndarray[np.npy_double, ndim=1] vec_gammas,
       double coeff_dual_scaling =1.,
-      double offset_radius=0., 
+      double offset_radius=0.,
       np.ndarray[long, ndim=1] index=None
    ):
       """ Apply the Gap safe sphere screening test
 
       Implementation of the safe screening test
-      
+
       Parameters
       ----------
       Atcabs : np.ndarray
@@ -101,7 +101,7 @@ cdef class GapTestAll:
       index : np.ndarray
          Array of indices that sort Atu in absolute value
          default is None
-      
+
       Returns
       -------
       calI_screen : np.ndarray
@@ -124,8 +124,8 @@ cdef class GapTestAll:
 
 
       # arange because I want entries 0, 1 being 0 and 1!
-      cdef np.ndarray[np.int_t, ndim=1] vec_p_star = np.arange(n+1, dtype=long)
-      cdef np.ndarray[np.int_t, ndim=1] vec_q_star = np.arange(n+1, dtype=long)
+      cdef np.ndarray[np.int32_t, ndim=1] vec_p_star = np.arange(n+1, dtype=long)
+      cdef np.ndarray[np.int32_t, ndim=1] vec_q_star = np.arange(n+1, dtype=long)
 
       # output
       cdef np.ndarray[np.npy_bool, ndim=1] calI_screen = np.zeros(n, dtype=bool)

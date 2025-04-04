@@ -21,17 +21,17 @@ def GAP_Ptest_mixed_impl(
     double lbd,
     np.ndarray[np.npy_double, ndim=1] Atcabs,
     double radius,
-    np.ndarray[np.int_t, ndim=1] index,
+    np.ndarray[np.int64_t, ndim=1] index,
     ):
-    
+
     cdef int n = Atcabs.shape[0]
     cdef int k, q, r
     cdef bool_t bool_exit = False
     cdef double tau = 0
 
     # arange because I want entries 0, 1 being 0 and 1!
-    cdef np.ndarray[np.int_t, ndim=1] vec_q_star = np.arange(n+1, dtype=np.int)
-    cdef np.ndarray[np.int_t, ndim=1] vec_r_star = np.arange(n+1, dtype=np.int)
+    cdef np.ndarray[np.int64_t, ndim=1] vec_q_star = np.arange(n+1, dtype=np.int)
+    cdef np.ndarray[np.int64_t, ndim=1] vec_r_star = np.arange(n+1, dtype=np.int)
 
     # Sortie
     cdef np.ndarray[np.npy_bool, ndim=1] calI_screen = np.zeros(n, dtype=np.bool)
@@ -42,7 +42,7 @@ def GAP_Ptest_mixed_impl(
     )[::-1]
 
     for k in range(2, n+1):
-        #+1 is to match paper index 
+        #+1 is to match paper index
         vec_q_star[k] = k \
             if vec_f[k-1] - vec_f[k-2]  >  lbd * (vec_gammas[k-1] - vec_gammas[k-2]) \
             else vec_q_star[k-1]
@@ -84,9 +84,9 @@ def gap_kappa_test(
     double lbd,
     np.ndarray[np.npy_double, ndim=1] Atcabs,
     double radius,
-    np.ndarray[np.int_t, ndim=1] index,
+    np.ndarray[np.int64_t, ndim=1] index,
     ):
-    
+
     cdef int n = Atcabs.shape[0]
     cdef int q, l_q
     cdef int l_min = 0
