@@ -89,12 +89,16 @@ This software is distributed under the [CeCILL Free Software Licence Agreement](
 If you use this package for your own work, please consider citing it with this piece of BibTeX:
 
 ```bibtex
-@article{Elvira2019arxiv,
-	Author = {Elvira, Cl\'ement and Herzet, C\'edric},
-	Journal = {},
-	Month = {},
-	Pdf = {},
-	Title = {Safe rules for the identification of zeros in the solution of the Slope problem},
-	Year = {2021},
+@article{Elvira2023,
+	author = {Elvira, Cl\'{e}ment and Herzet, C\'{e}dric},
+	title = {Safe Rules for the Identification of Zeros in the Solutions of the SLOPE Problem},
+	journal = {SIAM Journal on Mathematics of Data Science},
+	volume = {5},
+	number = {1},
+	pages = {147-173},
+	year = {2023},
+	doi = {10.1137/21M1457631},
+	URL = {https://doi.org/10.1137/21M1457631},
 }
+
 ```
